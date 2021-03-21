@@ -1,13 +1,19 @@
-from .main import serialized, get_all_files, Module, import_headers, get_file, get_module, File
+from .main import (
+    serialized,
+    get_all_files,
+    Module,
+    import_headers,
+    get_file,
+    get_module,
+    File,
+)
 import itertools
 from pathlib import Path
 
 
 def test_serialized():
     path = "/tmp/bitcoin/src/crypto/ctaes"
-    result = {
-        path: ["COPYING", "README.md", "bench.c", "ctaes.c", "ctaes.h", "test.c"]
-    }
+    result = {path: ["COPYING", "README.md", "bench.c", "ctaes.c", "ctaes.h", "test.c"]}
     ctaes = serialized(path)
     assert set(result[path]) == set(ctaes[path])
     assert result.keys() == ctaes.keys()
@@ -72,8 +78,12 @@ def test_xmodule():
 
 
 def test_import_headers():
-    assert set(["ctaes.h", "<stdio.h>", "<string.h>", "<assert.h>"]) == set(import_headers(Path("/tmp/bitcoin/src/crypto/ctaes/test.c").read_text()))
-    headers = import_headers(Path("/tmp/bitcoin/src/leveldb/port/port_stdcxx.h").read_text())
+    assert set(["ctaes.h", "<stdio.h>", "<string.h>", "<assert.h>"]) == set(
+        import_headers(Path("/tmp/bitcoin/src/crypto/ctaes/test.c").read_text())
+    )
+    headers = import_headers(
+        Path("/tmp/bitcoin/src/leveldb/port/port_stdcxx.h").read_text()
+    )
     should_have = [
         "port/port_config.h",
         "<crc32c/crc32c.h>",
@@ -84,7 +94,7 @@ def test_import_headers():
         "<cstdint>",
         "<mutex>",
         "<string>",
-        "port/thread_annotations.h"
+        "port/thread_annotations.h",
     ]
     assert set(headers) == set(should_have)
 
@@ -95,6 +105,7 @@ def test_get_file():
     assert test_file.name == path
     assert len(test_file.imports) == 4
 
+
 def test_module():
     path = "/tmp/bitcoin/src/crypto"
     result = get_module(get_all_files(path))
@@ -104,4 +115,3 @@ def test_module():
     assert len(subdirs) == 1
     assert "ctaes" in subdirs[0].name
     assert len(subdirs[0].contents) == 6
-
